@@ -1,4 +1,4 @@
-**# 💸 Finlytics
+# 💸 Finlytics
 
 > **Track Smarter • Budget Better • Analyze Everything**
 
