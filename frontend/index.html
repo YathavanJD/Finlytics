@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finlytics · Track Smarter</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0,1" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ===== AUTH OVERLAY ===== -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-logo">Finlytics</div>
+            <h2 id="authTitle">Welcome back</h2>
+            <p id="authSub">Sign in to track smarter.</p>
+            <input type="text" id="authName" placeholder="Full name" style="display:none;">
+            <input type="email" id="authEmail" placeholder="Email" value="demo@finlytics.com">
+            <input type="password" id="authPassword" placeholder="Password" value="password123">
+            <button class="btn btn-primary btn-full" id="authBtn">Sign In</button>
+            <div class="auth-switch" id="authSwitch">Don't have an account? <a id="toggleAuth">Sign up</a></div>
+            <div id="authError" class="auth-error"></div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div id="toastContainer"></div>
+
+    <!-- ===== MAIN APP ===== -->
+    <div class="app-container" id="appContainer" style="display:none;">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">Finlytics</div>
+                <span class="logo-dot">.</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-item active" data-page="dashboard">
+                        <span class="material-symbols-rounded">dashboard</span>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="nav-item" data-page="transactions">
+                        <span class="material-symbols-rounded">receipt_long</span>
+                        <span>Transactions</span>
+                    </div>
+                    <div class="nav-item" data-page="budgets">
+                        <span class="material-symbols-rounded">wallet</span>
+                        <span>Budgets</span>
+                    </div>
+                    <div class="nav-item" data-page="analytics">
+                        <span class="material-symbols-rounded">pie_chart</span>
+                        <span>Analytics</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Reports</div>
+                    <div class="nav-item" data-page="reports">
+                        <span class="material-symbols-rounded">assessment</span>
+                        <span>Reports</span>
+                    </div>
+                    <div class="nav-item" data-page="goals">
+                        <span class="material-symbols-rounded">flag</span>
+                        <span>Goals</span>
+                    </div>
+                    <div class="nav-item" data-page="settings">
+                        <span class="material-symbols-rounded">settings</span>
+                        <span>Settings</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="upgrade-card">
+                        <div class="upgrade-icon">⭐</div>
+                        <h4>Upgrade to Pro</h4>
+                        <p>Unlock advanced reports, export and more.</p>
+                        <button class="btn btn-primary btn-sm" id="upgradeBtn">Upgrade Now</button>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <div>
+                        <div class="user-name" id="userName">John Doe</div>
+                        <div class="user-email" id="userEmail">john@example.com</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+
+            <!-- ===== TOP BAR ===== -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p class="greeting" id="greetingText">Welcome back, John!</p>
+                </div>
+                <div class="top-bar-right">
+                    <button class="btn btn-primary" id="addExpenseBtn">
+                        <span class="material-symbols-rounded">add</span> Add
+                    </button>
+                    <button class="btn btn-outline" id="exportPdfBtn">
+                        <span class="material-symbols-rounded">picture_as_pdf</span> PDF
+                    </button>
+                    <button class="btn btn-outline" id="exportCsvBtn">
+                        <span class="material-symbols-rounded">download</span> CSV
+                    </button>
+                    <button class="btn btn-outline" id="importCsvBtn">
+                        <span class="material-symbols-rounded">upload_file</span> Import
+                    </button>
+                    <button class="theme-toggle" id="themeToggle">
+                        <span class="material-symbols-rounded">dark_mode</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ===== DASHBOARD VIEW ===== -->
+            <div id="dashboardView">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon balance">💰</span>
+                            <span class="stat-label">Total Balance</span>
+                        </div>
+                        <div class="stat-value" id="totalBalance">$0.00</div>
+                        <div class="stat-change positive" id="balanceChange">↑ Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon income">📈</span>
+                            <span class="stat-label">Total Income</span>
+                        </div>
+                        <div class="stat-value" id="totalIncome">$0.00</div>
+                        <div class="stat-change positive" id="incomeChange">↑ Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon expenses">📉</span>
+                            <span class="stat-label">Total Expenses</span>
+                        </div>
+                        <div class="stat-value" id="totalExpenses">$0.00</div>
+                        <div class="stat-change negative" id="expenseChange">↓ Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon savings">🏦</span>
+                            <span class="stat-label">Savings</span>
+                        </div>
+                        <div class="stat-value" id="savingsAmount">$0.00</div>
+                        <div class="stat-change positive" id="savingsChange">↑ Loading...</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card budget-overview">
+                        <div class="card-header">
+                            <h3>Budget Overview</h3>
+                            <span class="budget-percent">0% used</span>
+                        </div>
+                        <div class="budget-progress">
+                            <div class="budget-progress-bar" style="width:0%;"></div>
+                        </div>
+                        <p class="budget-subtext">You've used 0% of your total budget.</p>
+                        <div class="budget-stats">
+                            <div class="budget-stat">
+                                <span class="budget-stat-label">Monthly Budget</span>
+                                <span class="budget-stat-value" id="monthlyBudget">$6,000.00</span>
+                            </div>
+                            <div class="budget-stat">
+                                <span class="budget-stat-label">Spent</span>
+                                <span class="budget-stat-value" id="totalSpent">$0.00</span>
+                            </div>
+                            <div class="budget-stat">
+                                <span class="budget-stat-label">Remaining</span>
+                                <span class="budget-stat-value positive" id="budgetRemaining">$6,000.00</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-sm btn-full" id="viewBudgetBtn">View Budget</button>
+                    </div>
+
+                    <div class="card heatmap-card">
+                        <div class="card-header">
+                            <h3>Monthly Spending Heatmap</h3>
+                            <span class="material-symbols-rounded" style="color:var(--text-secondary);">calendar_month</span>
+                        </div>
+                        <div class="heatmap-grid" id="heatmapGrid"></div>
+                        <div class="heatmap-legend">
+                            <span>Low</span>
+                            <div class="legend-gradient"></div>
+                            <span>High</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Recent Transactions</h3>
+                        <button class="btn btn-outline btn-sm" id="viewAllTransactions">View All</button>
+                    </div>
+                    <div class="transactions-list" id="transactionList">
+                        <div class="transaction-item" style="justify-content:center; color:var(--text-secondary);">Loading transactions...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== TRANSACTIONS VIEW ===== -->
+            <div id="transactionsView" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>All Transactions</h3>
+                        <div class="filter-group">
+                            <input type="date" id="filterStartDate" class="filter-input">
+                            <span>to</span>
+                            <input type="date" id="filterEndDate" class="filter-input">
+                            <button class="btn btn-primary btn-sm" id="applyFilterBtn">Apply</button>
+                            <button class="btn btn-outline btn-sm" id="clearFilterBtn">Clear</button>
+                        </div>
+                    </div>
+                    <input type="text" id="searchTransactions" placeholder="Search transactions..." class="search-input">
+                    <div class="transactions-list" id="allTransactionsList">
+                        <div class="transaction-item" style="justify-content:center; color:var(--text-secondary);">Loading transactions...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== BUDGETS VIEW ===== -->
+            <div id="budgetsView" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Manage Budgets</h3>
+                        <button class="btn btn-primary" id="addBudgetBtn">+ Add Budget</button>
+                    </div>
+                    <div id="budgetManagement">
+                        <p style="text-align:center; color:var(--text-secondary); padding:1rem 0;">Loading budgets...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ANALYTICS VIEW ===== -->
+            <div id="analyticsView" style="display:none;">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header"><h3>Spending Analytics</h3></div>
+                        <div class="analytics-grid">
+                            <div class="analytics-item">
+                                <span class="analytics-label">Savings Rate</span>
+                                <span class="analytics-value" id="savingsRate">0%</span>
+                            </div>
+                            <div class="analytics-item">
+                                <span class="analytics-label">Top Category</span>
+                                <span class="analytics-value" id="topCategory">-</span>
+                            </div>
+                            <div class="analytics-item">
+                                <span class="analytics-label">Avg Daily</span>
+                                <span class="analytics-value" id="avgDaily">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card card-wide">
+                        <div class="card-header"><h3>Category Breakdown</h3></div>
+                        <div id="categoryBreakdown">
+                            <p style="color:var(--text-secondary);">No data available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== REPORTS VIEW ===== -->
+            <div id="reportsView" style="display:none;">
+                <div class="dashboard-grid">
+                    <div class="card card-full">
+                        <div class="card-header">
+                            <h3>Financial Reports</h3>
+                            <div class="filter-group">
+                                <select id="reportType" class="filter-input">
+                                    <option value="monthly">Monthly Report</option>
+                                    <option value="quarterly">Quarterly Report</option>
+                                    <option value="yearly">Yearly Report</option>
+                                </select>
+                                <button class="btn btn-primary btn-sm" id="generateReportBtn">Generate Report</button>
+                            </div>
+                        </div>
+                        <div id="reportContent">
+                            <div class="report-summary" id="reportSummary">
+                                <div class="report-stat">
+                                    <span class="report-label">Total Income</span>
+                                    <span class="report-value" id="reportIncome">$0.00</span>
+                                </div>
+                                <div class="report-stat">
+                                    <span class="report-label">Total Expenses</span>
+                                    <span class="report-value" id="reportExpenses">$0.00</span>
+                                </div>
+                                <div class="report-stat">
+                                    <span class="report-label">Net Profit</span>
+                                    <span class="report-value" id="reportProfit">$0.00</span>
+                                </div>
+                                <div class="report-stat">
+                                    <span class="report-label">Transaction Count</span>
+                                    <span class="report-value" id="reportCount">0</span>
+                                </div>
+                            </div>
+                            <div class="report-chart-container">
+                                <h4>Monthly Trend</h4>
+                                <div class="report-chart" id="reportChart">
+                                    <div class="report-bar-container" id="reportBarContainer"></div>
+                                </div>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn btn-primary" id="exportReportPdf">Export as PDF</button>
+                                <button class="btn btn-outline" id="exportReportCsv">Export as CSV</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== GOALS VIEW ===== -->
+            <div id="goalsView" style="display:none;">
+                <div class="dashboard-grid">
+                    <div class="card card-full">
+                        <div class="card-header">
+                            <h3>Financial Goals</h3>
+                            <button class="btn btn-primary" id="addGoalBtn">+ Add Goal</button>
+                        </div>
+                        <div id="goalsList">
+                            <p style="text-align:center; color:var(--text-secondary); padding:1rem 0;">Loading goals...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SETTINGS VIEW ===== -->
+            <div id="settingsView" style="display:none;">
+                <div class="dashboard-grid">
+                    <div class="card card-full">
+                        <div class="card-header"><h3>Settings</h3></div>
+                        
+                        <div class="settings-section">
+                            <h4>Profile Settings</h4>
+                            <div class="settings-group">
+                                <div class="settings-item">
+                                    <label>Name</label>
+                                    <input type="text" id="settingsName" placeholder="Your name" class="settings-input">
+                                </div>
+                                <div class="settings-item">
+                                    <label>Email</label>
+                                    <input type="email" id="settingsEmail" placeholder="Your email" class="settings-input">
+                                </div>
+                                <div class="settings-item">
+                                    <label>Currency</label>
+                                    <select id="settingsCurrency" class="settings-input">
+                                        <optgroup label="Major Currencies">
+                                            <option value="USD">🇺🇸 USD - US Dollar ($)</option>
+                                            <option value="EUR">🇪🇺 EUR - Euro (€)</option>
+                                            <option value="GBP">🇬🇧 GBP - British Pound (£)</option>
+                                            <option value="JPY">🇯🇵 JPY - Japanese Yen (¥)</option>
+                                            <option value="CHF">🇨🇭 CHF - Swiss Franc (Fr)</option>
+                                            <option value="CAD">🇨🇦 CAD - Canadian Dollar (C$)</option>
+                                            <option value="AUD">🇦🇺 AUD - Australian Dollar (A$)</option>
+                                            <option value="CNY">🇨🇳 CNY - Chinese Yuan (¥)</option>
+                                        </optgroup>
+                                        <optgroup label="Asia">
+                                            <option value="LKR">🇱🇰 LKR - Sri Lankan Rupee (Rs)</option>
+                                            <option value="INR">🇮🇳 INR - Indian Rupee (₹)</option>
+                                            <option value="SGD">🇸🇬 SGD - Singapore Dollar (S$)</option>
+                                            <option value="HKD">🇭🇰 HKD - Hong Kong Dollar (HK$)</option>
+                                            <option value="KRW">🇰🇷 KRW - South Korean Won (₩)</option>
+                                            <option value="TWD">🇹🇼 TWD - Taiwan Dollar (NT$)</option>
+                                            <option value="MYR">🇲🇾 MYR - Malaysian Ringgit (RM)</option>
+                                            <option value="IDR">🇮🇩 IDR - Indonesian Rupiah (Rp)</option>
+                                            <option value="PHP">🇵🇭 PHP - Philippine Peso (₱)</option>
+                                            <option value="VND">🇻🇳 VND - Vietnamese Dong (₫)</option>
+                                            <option value="THB">🇹🇭 THB - Thai Baht (฿)</option>
+                                            <option value="ILS">🇮🇱 ILS - Israeli Shekel (₪)</option>
+                                        </optgroup>
+                                        <optgroup label="Europe">
+                                            <option value="NOK">🇳🇴 NOK - Norwegian Krone (kr)</option>
+                                            <option value="SEK">🇸🇪 SEK - Swedish Krona (kr)</option>
+                                            <option value="DKK">🇩🇰 DKK - Danish Krone (kr)</option>
+                                            <option value="PLN">🇵🇱 PLN - Polish Zloty (zł)</option>
+                                            <option value="CZK">🇨🇿 CZK - Czech Koruna (Kč)</option>
+                                            <option value="HUF">🇭🇺 HUF - Hungarian Forint (Ft)</option>
+                                            <option value="TRY">🇹🇷 TRY - Turkish Lira (₺)</option>
+                                            <option value="RUB">🇷🇺 RUB - Russian Ruble (₽)</option>
+                                        </optgroup>
+                                        <optgroup label="Americas">
+                                            <option value="MXN">🇲🇽 MXN - Mexican Peso ($)</option>
+                                            <option value="BRL">🇧🇷 BRL - Brazilian Real (R$)</option>
+                                            <option value="ARS">🇦🇷 ARS - Argentine Peso ($)</option>
+                                            <option value="CLP">🇨🇱 CLP - Chilean Peso ($)</option>
+                                            <option value="COP">🇨🇴 COP - Colombian Peso ($)</option>
+                                            <option value="PEN">🇵🇪 PEN - Peruvian Sol (S/)</option>
+                                        </optgroup>
+                                        <optgroup label="Middle East & Africa">
+                                            <option value="AED">🇦🇪 AED - UAE Dirham (د.إ)</option>
+                                            <option value="SAR">🇸🇦 SAR - Saudi Riyal (﷼)</option>
+                                            <option value="ZAR">🇿🇦 ZAR - South African Rand (R)</option>
+                                            <option value="EGP">🇪🇬 EGP - Egyptian Pound (£)</option>
+                                            <option value="NGN">🇳🇬 NGN - Nigerian Naira (₦)</option>
+                                        </optgroup>
+                                        <optgroup label="Oceania">
+                                            <option value="NZD">🇳🇿 NZD - New Zealand Dollar (NZ$)</option>
+                                            <option value="FJD">🇫🇯 FJD - Fiji Dollar (FJ$)</option>
+                                        </optgroup>
+                                        <optgroup label="Other">
+                                            <option value="BTC">₿ Bitcoin (BTC)</option>
+                                            <option value="ETH">⟠ Ethereum (ETH)</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary" id="saveProfileBtn">Save Profile</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h4>Preferences</h4>
+                            <div class="settings-group">
+                                <div class="settings-item">
+                                    <label>Default View</label>
+                                    <select id="settingsDefaultView" class="settings-input">
+                                        <option value="dashboard">Dashboard</option>
+                                        <option value="transactions">Transactions</option>
+                                        <option value="budgets">Budgets</option>
+                                        <option value="analytics">Analytics</option>
+                                        <option value="reports">Reports</option>
+                                    </select>
+                                </div>
+                                <div class="settings-item checkbox-item">
+                                    <label>
+                                        <input type="checkbox" id="settingsNotifications" checked>
+                                        Email Notifications
+                                    </label>
+                                </div>
+                                <div class="settings-item checkbox-item">
+                                    <label>
+                                        <input type="checkbox" id="settingsBudgetAlerts" checked>
+                                        Budget Alerts
+                                    </label>
+                                </div>
+                                <div class="settings-item checkbox-item">
+                                    <label>
+                                        <input type="checkbox" id="settingsDarkMode">
+                                        Dark Mode (Auto)
+                                    </label>
+                                </div>
+                                <button class="btn btn-primary" id="savePreferencesBtn">Save Preferences</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h4>Data Management</h4>
+                            <div class="settings-group">
+                                <div class="settings-item">
+                                    <label>Export / Import</label>
+                                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                                        <button class="btn btn-outline" id="exportAllDataBtn">Export All Data</button>
+                                        <button class="btn btn-outline" id="importAllDataBtn">Import Data</button>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <label>Danger Zone</label>
+                                    <button class="btn btn-danger" id="clearAllDataBtn">Clear All Data</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h4>About Finlytics</h4>
+                            <div class="settings-group">
+                                <div class="settings-item">
+                                    <label>Version</label>
+                                    <span style="font-weight:600; padding:0.5rem 0; color:var(--text-primary);">2.0.0</span>
+                                </div>
+                                <div class="settings-item">
+                                    <label>Made with</label>
+                                    <span style="font-weight:600; padding:0.5rem 0; color:var(--text-primary);">❤️ Track Smarter • Budget Better • Analyze Everything</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+    <div id="addExpenseModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content card">
+            <h3 style="margin-bottom:1rem;">Add Transaction</h3>
+            <form id="expenseForm">
+                <input type="text" id="txDescription" placeholder="Description *" required>
+                <input type="number" id="txAmount" placeholder="Amount *" step="0.01" required>
+                <select id="txType" required>
+                    <option value="expense">Expense</option>
+                    <option value="income">Income</option>
+                </select>
+                <select id="txCategory" required>
+                    <option value="Food">Food</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Salary">Salary</option>
+                    <option value="Freelance">Freelance</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="date" id="txDate">
+                <input type="text" id="txNotes" placeholder="Notes (optional)">
+                <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex:1;">Save</button>
+                    <button type="button" class="btn btn-outline" id="closeModalBtn" style="flex:1;">Cancel</button>
+                </div>
+            </form>
+            <div id="formError" style="color:var(--error); margin-top:0.5rem; display:none;"></div>
+        </div>
+    </div>
+
+    <div id="addBudgetModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content card">
+            <h3 id="budgetModalTitle" style="margin-bottom:1rem;">Add Budget Category</h3>
+            <form id="budgetForm">
+                <input type="hidden" id="editBudgetCategory">
+                <select id="budgetCategory" required>
+                    <option value="Food">Food</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="number" id="budgetAmount" placeholder="Monthly Budget *" step="0.01" required>
+                <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex:1;" id="budgetSubmitBtn">Save</button>
+                    <button type="button" class="btn btn-outline" id="closeBudgetModalBtn" style="flex:1;">Cancel</button>
+                </div>
+            </form>
+            <div id="budgetFormError" style="color:var(--error); margin-top:0.5rem; display:none;"></div>
+        </div>
+    </div>
+
+    <div id="addGoalModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content card">
+            <h3 style="margin-bottom:1rem;">Add Financial Goal</h3>
+            <form id="goalForm">
+                <input type="text" id="goalName" placeholder="Goal Name *" required>
+                <input type="number" id="goalTarget" placeholder="Target Amount *" step="0.01" required>
+                <input type="number" id="goalCurrent" placeholder="Current Amount *" step="0.01" required>
+                <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex:1;">Add Goal</button>
+                    <button type="button" class="btn btn-outline" id="closeGoalModalBtn" style="flex:1;">Cancel</button>
+                </div>
+            </form>
+            <div id="goalFormError" style="color:var(--error); margin-top:0.5rem; display:none;"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

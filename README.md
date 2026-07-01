@@ -241,4 +241,3 @@ origin: ['https://your-frontend.netlify.app']
 | Validation | Joi, express-validator |
 | Security | Helmet, express-rate-limit, CORS |
 | DevOps | Docker, Docker Compose |
-**
