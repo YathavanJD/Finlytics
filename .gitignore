@@ -1,4 +1,0 @@
-# .gitignore (place this in the finlytics/ root)
-node_modules/
-backend/.env
-.DS_Store
